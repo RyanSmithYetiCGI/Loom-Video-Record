@@ -26,8 +26,19 @@ function App() {
         return;
       }
 
+      console.log("PUBLIC_APP_ID: ", PUBLIC_APP_ID);
+
+      const serverJws = JSON.parse(await (await fetch("https://0sh3wj6bh0.execute-api.us-east-1.amazonaws.com/test/request-jwt", {
+        method: 'POST',
+        body: JSON.stringify({
+          public_app_id: PUBLIC_APP_ID
+        })
+      })).text()).body
+
+      console.log("serverJws: ", serverJws);
+
       const { configureButton } = await setup({
-        publicAppId: PUBLIC_APP_ID,
+        jws: JSON.parse(serverJws),
       });
 
       const sdkButton = configureButton({ element: button });

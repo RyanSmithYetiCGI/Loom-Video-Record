@@ -12,6 +12,7 @@
   "dependencies": {
     "@loomhq/loom-embed": "^1.7.0",
     "@loomhq/record-sdk": "^3.1.0",
+    "aws-sdk": "^2.1593.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
