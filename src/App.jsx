@@ -26,16 +26,12 @@ function App() {
         return;
       }
 
-      console.log("PUBLIC_APP_ID: ", PUBLIC_APP_ID);
-
       const serverJws = JSON.parse(await (await fetch("https://0sh3wj6bh0.execute-api.us-east-1.amazonaws.com/test/request-jwt", {
         method: 'POST',
         body: JSON.stringify({
           public_app_id: PUBLIC_APP_ID
         })
-      })).text()).body
-
-      console.log("serverJws: ", serverJws);
+      })).text()).body;
 
       const { configureButton } = await setup({
         jws: JSON.parse(serverJws),
@@ -44,7 +40,6 @@ function App() {
       const sdkButton = configureButton({ element: button });
 
       sdkButton.on("insert-click", async (video) => {
-        console.log({message: "Hello, world!"});
         const { html } = await oembed(video.sharedUrl, { width: 10, height: 10 });
         setVideoHTML(html);
       });
