@@ -1,9 +1,7 @@
 import './App.css';
 import { setup } from "@loomhq/record-sdk";
 import { isSupported } from "@loomhq/record-sdk/is-supported";
-// import { oembed } from "@loomhq/loom-embed";
 import { useEffect, useState } from "react";
-import clipboardy from 'clipboardy';
 
 const queryParams = new URLSearchParams(window.location.search);
 const PUBLIC_APP_ID = queryParams.get("public_app_id");
@@ -51,6 +49,7 @@ function App() {
 
       sdkButton.on("insert-click", async (video) => {
         document.documentElement.setAttribute("loomLink", video.sharedUrl); // Custom attribute
+        console.log("iFrame: set the attribute 'loomLink' to '" + video.sharedUrl + "'.")
         setLink(video.sharedUrl);
         setIcon("content_copy");
       });
@@ -63,7 +62,7 @@ function App() {
     <>
       <button id={BUTTON_ID}>Record</button>
       {link && <div style={{backgroundColor: "#303030", marginTop: "10px", borderRadius: "10px", padding: "8px 16px", display: "flex", alignItems: "center", justifyContent: "center"}} id={LINK_ID}>
-        {link}
+        Copy Loom Link
         <button onClick={handleCopyLink} style={{marginLeft: "10px", backgroundColor: "#474747", borderRadius: "10px", padding: "0px 8px"}} id={LINK_COPY_ID}>
           <span className="material-icons" style={{ marginTop: "5px" }}>{icon}</span>
         </button>
