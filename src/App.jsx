@@ -1,15 +1,25 @@
 import './App.css';
 import { setup } from "@loomhq/record-sdk";
 import { isSupported } from "@loomhq/record-sdk/is-supported";
-import { oembed } from "@loomhq/loom-embed";
+// import { oembed } from "@loomhq/loom-embed";
 import { useEffect, useState } from "react";
+import clipboardy from 'clipboardy';
 
 const queryParams = new URLSearchParams(window.location.search);
 const PUBLIC_APP_ID = queryParams.get("public_app_id");
+
 const BUTTON_ID = "loom-record-sdk-button";
+const LINK_ID = "loom-share-link"
+const LINK_COPY_ID = "loom-share-link-copy-to-clip-board"
 
 function App() {
-  const [videoHTML, setVideoHTML] = useState("");
+  const [link, setLink] = useState("");
+  const [icon, setIcon] = useState("content_copy"); // true for IconBeforeClick, false for IconAfterClick
+
+  async function handleCopyLink() {
+    await navigator.clipboard.writeText(link);
+    setIcon("done");
+  }
 
   useEffect(() => {
     async function setupLoom() {
@@ -26,22 +36,23 @@ function App() {
         return;
       }
 
-      const serverJws = JSON.parse(await (await fetch("https://0sh3wj6bh0.execute-api.us-east-1.amazonaws.com/test/request-jwt", {
+      const serverJws = JSON.parse(JSON.parse(await (await fetch("https://0sh3wj6bh0.execute-api.us-east-1.amazonaws.com/test/request-jwt", {
         method: 'POST',
         body: JSON.stringify({
           public_app_id: PUBLIC_APP_ID
         })
-      })).text()).body;
+      })).text()).body);
 
       const { configureButton } = await setup({
-        jws: JSON.parse(serverJws),
+        jws: serverJws,
       });
 
       const sdkButton = configureButton({ element: button });
 
       sdkButton.on("insert-click", async (video) => {
-        const { html } = await oembed(video.sharedUrl, { width: 10, height: 10 });
-        setVideoHTML(html);
+        document.documentElement.setAttribute("loomLink", video.sharedUrl); // Custom attribute
+        setLink(video.sharedUrl);
+        setIcon("content_copy");
       });
     }
 
@@ -51,37 +62,14 @@ function App() {
   return (
     <>
       <button id={BUTTON_ID}>Record</button>
+      {link && <div style={{backgroundColor: "#303030", marginTop: "10px", borderRadius: "10px", padding: "8px 16px", display: "flex", alignItems: "center", justifyContent: "center"}} id={LINK_ID}>
+        {link}
+        <button onClick={handleCopyLink} style={{marginLeft: "10px", backgroundColor: "#474747", borderRadius: "10px", padding: "0px 8px"}} id={LINK_COPY_ID}>
+          <span className="material-icons" style={{ marginTop: "5px" }}>{icon}</span>
+        </button>
+      </div>}
     </>
   );
 }
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <div>
-//         <a href="https://vitejs.dev" target="_blank">
-//           <img src={viteLogo} className="logo" alt="Vite logo" />
-//         </a>
-//         <a href="https://react.dev" target="_blank">
-//           <img src={reactLogo} className="logo react" alt="React logo" />
-//         </a>
-//       </div>
-//       <h1>Vite + React</h1>
-//       <div className="card">
-//         <button onClick={() => setCount((count) => count + 1)}>
-//           count is {count}
-//         </button>
-//         <p>
-//           Edit <code>src/App.jsx</code> and save to test HMR
-//         </p>
-//       </div>
-//       <p className="read-the-docs">
-//         Click on the Vite and React logos to learn more
-//       </p>
-//     </>
-//   )
-// }
 
 export default App
